@@ -1,8 +1,11 @@
 import random
 import tkinter as tk
-from tkinter import ttk  # Import ttk for modern widgets like Treeview
+from tkinter import font
+from tkinter import ttk
 
-# ... (Keep all your dictionary definitions and calculate_skin_price function exactly the same)
+
+
+
 drops_rates = {
     "Blue": 79.92,
     "Purple": 15.98,
@@ -77,24 +80,27 @@ total_golds_value = 0
 
 root = tk.Tk()
 root.title("CS2 CASE SIM")
-root.geometry("1920x1080")  # Made slightly wider to comfortably fit the 14-digit floats
-root.configure(bg="#1e1e1e")  # Dark theme background
+root.geometry("1920x1080")  
+root.configure(bg="#1e1e1e") 
 
-# Apply a clean, modern style layout
+
 style = ttk.Style()
 style.theme_use("clam")
 style.configure("Treeview", background="#2b2b2b", foreground="white", fieldbackground="#2b2b2b", rowheight=25)
 style.map("Treeview", background=[("selected", "#4a4a4a")])
 
+
 # Top Frame for Stats & Button
 top_frame = tk.Frame(root, bg="#1e1e1e")
 top_frame.pack(pady=15, fill="x", padx=20, anchor="center")
 
-# Real-time Stats Labels
+
+# Stats Labels
+stat_font = font.Font(family="Weghorst-Italic", size=14)
 stats_label = tk.Label(
     top_frame, 
-    text="Total Spent: $0.00 \n Inventory Value: $0.00 \n ROI: 0% \n Cases: 0 \n\n Lowest Float: N/A \n\n Blues: 0 $0 \n\n Purples: 0 $0 \n\n Pinks: 0 $0 \n\n Reds: 0 $0 \n First Red: 0 \n Total Spent for First Red: $0 \n\n Golds: 0 $0 \n First Gold: 0 \n Total Spent for First Gold: $0", 
-    font=("Arial", 11, "bold"), 
+    text="Total Spent: $0.00 \n Inventory Value: $0.00 \n ROI: 0% \n Cases: 0 \n\n Lowest Float: N/A \n\n Blues: 0 | $0 \n\n Purples: 0 | $0 \n\n Pinks: 0 | $0 \n\n Reds: 0 | $0 \n First Red: 0 \n Total Spent for First Red: $0 \n\n Golds: 0 | $0 \n First Gold: 0 \n Total Spent for First Gold: $0", 
+    font=(stat_font), 
     fg="#ecf0f1", 
     bg="#1e1e1e",
     justify="center"
@@ -103,8 +109,8 @@ stats_label.pack(side="left", anchor="center", expand=True, fill="both")
 
 mass_open_label = tk.Label(
     top_frame,
-    text="MASS OPENING: \n\n Players: 0 \n Cases: 0 \n Total Cases Opened: 0 \n Total Spent: $0 \n Total Blues: 0 \n Total Purples: 0 \n Total Pinks: 0 \n Total Reds: 0 \n Total Golds: \n",
-    font=("Arial", 11, "bold"), 
+    text="MASS OPENING: \n\n Players: 0 \n Cases: 0 \n Total Cases Opened: 0 \n Total Spent: $0 \n Total Blues: 0 \n Total Purples: 0 \n Total Pinks: 0 \n Total Reds: 0 \n Total Golds: 0",
+    font=(stat_font), 
     fg="#ecf0f1", 
     bg="#1e1e1e",
     justify="center"
@@ -136,7 +142,7 @@ skip_checkbox = tk.Checkbutton(
     bg="#1e1e1e",
     activebackground="#1e1e1e",
     activeforeground="#ecf0f1",
-    selectcolor="#2b2b2b" # Changes the small check box square background color
+    selectcolor="#2b2b2b" # Changes the check box square background color
 )
 skip_checkbox.pack(pady=5)
 
@@ -148,7 +154,6 @@ current_offset = 0
 velocity = 0
 winning_item_data = None
 
-# A clean mapping of text hex-codes to make rarity tiers pop visually on the wheel
 TIER_COLORS = {
     "Blue": "#5c75cd",
     "Purple": "#9d0aff",
@@ -160,11 +165,11 @@ TIER_COLORS = {
 anim_frame = tk.Frame(root, bg="#1a1a1a", height=120)
 anim_frame.pack(fill="x", padx=20, pady=10)
 
-# Create the canvas viewport (width=700 allows a good view of neighboring items)
+
 roll_canvas = tk.Canvas(anim_frame, width=700, height=100, bg="#222222", highlightthickness=2, highlightbackground="#3a3a3a")
 roll_canvas.pack(anchor="center")
 
-# Draw a red vertical selector needle exactly in the center (X = 350)
+
 roll_canvas.create_line(350, 0, 350, 100, fill="#eb3434", width=3, tags="needle")
 
 
@@ -176,11 +181,11 @@ roll_canvas.create_line(350, 0, 350, 100, fill="#eb3434", width=3, tags="needle"
 tree_frame = tk.Frame(root)
 tree_frame.pack(pady=10, fill="both", expand=True, padx=20)
 
-# Create Scrollbar for the list view
+# Scrollbar for list view
 tree_scroll = ttk.Scrollbar(tree_frame)
 tree_scroll.pack(side="right", fill="y")
 
-# Define Columns
+# Columns
 columns = ("item", "tier", "wear", "float", "price", "total spent")
 inventory_list = ttk.Treeview(tree_frame, columns=columns, show="headings", yscrollcommand=tree_scroll.set)
 tree_scroll.config(command=inventory_list.yview)
@@ -221,7 +226,7 @@ def update_ui_stats():
     else:
         best_drop_text = "N/A"
 
-    stats_label.config(text=f"Total Spent: ${total_spent:,.2f} \n Inventory Value: ${inventory_value:,.2f} \n Return: {roi:,.1f}% \n Cases: {cases} \n\n Lowest Float: {best_drop_text} \n\n Blues: {blues} ${total_blues_value:,.2f} \n\n Purples: {purples} ${total_purples_value:,.2f} \n\n Pinks: {pinks} ${total_pinks_value:,.2f} \n\n Reds: {reds} ${total_reds_value:,.2f} \n First Red: {first_red[0] if reds > 0 else 0} \n Total Spent for First Red: ${(first_red[0] * (kilowatt_case_base_price + key_price)) if reds > 0 else 0:,.2f} \n\n Golds: {golds} ${total_golds_value:,.2f} \n First Gold: {first_gold[0] if golds > 0 else 0} \n Total Spent for First Gold: ${(first_gold[0] * (kilowatt_case_base_price + key_price)) if golds > 0 else 0:,.2f}", justify="center")
+    stats_label.config(text=f"Total Spent: ${total_spent:,.2f} \n Inventory Value: ${inventory_value:,.2f} \n Return: {roi:,.1f}% \n Cases: {cases:,} \n\n Lowest Float: {best_drop_text} \n\n Blues: {blues:,} | ${total_blues_value:,.2f} \n\n Purples: {purples:,} | ${total_purples_value:,.2f} \n\n Pinks: {pinks:,} | ${total_pinks_value:,.2f} \n\n Reds: {reds:,} | ${total_reds_value:,.2f} \n First Red: {first_red[0] if reds > 0 else 0} \n Total Spent for First Red: ${(first_red[0] * (kilowatt_case_base_price + key_price)) if reds > 0 else 0:,.2f} \n\n Golds: {golds:,} | ${total_golds_value:,.2f} \n First Gold: {first_gold[0] if golds > 0 else 0} \n Total Spent for First Gold: ${(first_gold[0] * (kilowatt_case_base_price + key_price)) if golds > 0 else 0:,.2f}", justify="center")
 
 
 def mass_open():
@@ -351,9 +356,9 @@ def mass_open():
              f"Cases Per Player: {cases_per_player:,}\n"
              f"Total Batch Cases: {total_mass_cases:,}\n"
              f"Batch Spent: ${batch_spent:,.2f}\n\n"
-             f"Blues: {batch_blues} | Purples: {batch_purples}\n"
-             f"Pinks: {batch_pinks} | Reds: {batch_reds}\n"
-             f"Golds: {batch_golds}\n"
+             f"Blues: {batch_blues:,} | Purples: {batch_purples:,}\n"
+             f"Pinks: {batch_pinks:,} | Reds: {batch_reds:,}\n"
+             f"Golds: {batch_golds:,}\n"
     )
 
     # 7. Refresh your regular single-opening HUD label at the top center
@@ -391,7 +396,7 @@ def open_case():
     if animation_running:
         return
 
-    # 1. Roll the winner tier using our clean helper function
+    # 1. Roll the winner tier
     tier_choice = roll_random_tier()
 
     # 2. Gather weapons matching the winner tier
@@ -422,7 +427,7 @@ def open_case():
 
     # ================= THE SKIP CHECKPOINT =================
     if skip_animation_var.get():
-        # Complete bypass! No animation logic or 2nd loops are touched
+        
         cases += 1
         if tier_choice == "Blue": 
             blues += 1
@@ -453,16 +458,16 @@ def open_case():
         )
         inventory.append(winning_item_data)
         update_ui_stats()
-        return  # End function instantly
+        return
     # =======================================================
 
-    # 3. Build the ticker wheel using the exact same function for the filler items
+    
     ticker_items = []
     for i in range(45):  
         if i == 35:
             ticker_items.append((gun_choice, tier_choice))
         else:
-            # Reusing the helper function safely for visual fillers!
+            
             filler_tier = roll_random_tier()
             
             filler_pool = []
@@ -473,7 +478,7 @@ def open_case():
             rand_filler_item = random.choice(filler_pool)
             ticker_items.append(rand_filler_item)
 
-    # 4. Mathematical Physics Targeting
+    # Mathematical Physics Targeting
     card_width = 130
     card_gap = 10
     total_card_step = card_width + card_gap  
@@ -566,7 +571,7 @@ def animate_ticker():
         update_ui_stats()
 
 
-# Action Button at the bottom
+# Action Button
 open_case_button = tk.Button(
     root, 
     text="OPEN KILOWATT CASE ($2.79)", 
